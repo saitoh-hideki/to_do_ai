@@ -59,10 +59,26 @@ const GoogleMap = () => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2 style={{ color: '#111', fontWeight: 'bold', fontSize: '24px', marginBottom: '20px' }}>ルート検索</h2>
+    <div style={{ 
+      padding: window.innerWidth <= 768 ? '16px' : '20px',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      background: '#ffffff',
+      borderRadius: 16,
+      boxShadow: '0 4px 16px rgba(0,0,0,0.10)',
+      overflowY: window.innerWidth <= 768 ? 'auto' : 'hidden',
+      maxHeight: window.innerWidth <= 768 ? '100vh' : 'none'
+    }}>
+      <h2 style={{ 
+        color: '#111', 
+        fontWeight: 'bold', 
+        fontSize: window.innerWidth <= 768 ? '20px' : '24px', 
+        marginBottom: '20px',
+        flexShrink: 0
+      }}>ルート検索</h2>
       
-      <div style={{ marginBottom: '20px' }}>
+      <div style={{ marginBottom: '20px', flexShrink: 0 }}>
         <input
           type="text"
           value={origin}
@@ -70,11 +86,11 @@ const GoogleMap = () => {
           placeholder="出発地"
           style={{
             width: '100%',
-            padding: '12px',
+            padding: window.innerWidth <= 768 ? '10px' : '12px',
             marginBottom: '10px',
             borderRadius: '8px',
             border: '1px solid #ddd',
-            fontSize: '16px'
+            fontSize: window.innerWidth <= 768 ? '14px' : '16px'
           }}
         />
         <input
@@ -84,23 +100,24 @@ const GoogleMap = () => {
           placeholder="目的地"
           style={{
             width: '100%',
-            padding: '12px',
+            padding: window.innerWidth <= 768 ? '10px' : '12px',
             marginBottom: '10px',
             borderRadius: '8px',
             border: '1px solid #ddd',
-            fontSize: '16px'
+            fontSize: window.innerWidth <= 768 ? '14px' : '16px'
           }}
         />
         <button
           onClick={calculateRoute}
           style={{
-            padding: '12px 24px',
+            padding: window.innerWidth <= 768 ? '10px 20px' : '12px 24px',
             backgroundColor: '#4a90e2',
             color: 'white',
             border: 'none',
             borderRadius: '8px',
-            fontSize: '16px',
-            cursor: 'pointer'
+            fontSize: window.innerWidth <= 768 ? '14px' : '16px',
+            cursor: 'pointer',
+            width: window.innerWidth <= 768 ? '100%' : 'auto'
           }}
         >
           ルート検索
@@ -109,14 +126,15 @@ const GoogleMap = () => {
 
       {route && (
         <div style={{
-          padding: '15px',
+          padding: window.innerWidth <= 768 ? '12px' : '15px',
           backgroundColor: '#f8f9fa',
           borderRadius: '8px',
-          marginBottom: '20px'
+          marginBottom: '20px',
+          flexShrink: 0
         }}>
-          <h3>ルート情報</h3>
-          <p><strong>距離:</strong> {route.distance}</p>
-          <p><strong>時間:</strong> {route.duration}</p>
+          <h3 style={{ fontSize: window.innerWidth <= 768 ? '16px' : '18px' }}>ルート情報</h3>
+          <p style={{ fontSize: window.innerWidth <= 768 ? '14px' : '16px' }}><strong>距離:</strong> {route.distance}</p>
+          <p style={{ fontSize: window.innerWidth <= 768 ? '14px' : '16px' }}><strong>時間:</strong> {route.duration}</p>
         </div>
       )}
 
@@ -124,9 +142,10 @@ const GoogleMap = () => {
         ref={mapRef}
         style={{
           width: '100%',
-          height: '400px',
+          flex: 1,
           borderRadius: '8px',
-          border: '1px solid #ddd'
+          border: '1px solid #ddd',
+          minHeight: window.innerWidth <= 768 ? '300px' : '400px'
         }}
       />
     </div>

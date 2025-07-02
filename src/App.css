@@ -40,3 +40,85 @@
 .read-the-docs {
   color: #888;
 }
+
+body, .App {
+  background: #101014 !important;
+  color: #f5f5f7 !important;
+}
+
+/* ダッシュボードのカードやパネル背景 */
+.dashboard-card, .dashboard-panel, .dashboard-bg, .dashboard-container {
+  background: linear-gradient(135deg, #18181c 60%, #23232a 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 1.5px 0 #222 inset;
+  color: #f5f5f7;
+}
+
+/* 3Dボタン共通デザイン（黒背景用に微調整） */
+.btn-3d {
+  background: linear-gradient(180deg, #23233a 0%, #101014 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(79,140,255,0.18), 0 1.5px 0 #222 inset;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 12px 28px;
+  transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+  cursor: pointer;
+  position: relative;
+  outline: none;
+  letter-spacing: 0.04em;
+}
+.btn-3d:active {
+  box-shadow: 0 2px 8px rgba(79,140,255,0.10), 0 1.5px 0 #222 inset;
+  transform: translateY(2px) scale(0.98);
+}
+.btn-3d:hover:not(:disabled) {
+  box-shadow: 0 8px 32px rgba(79,140,255,0.28), 0 1.5px 0 #174ea6 inset;
+  background: linear-gradient(180deg, #2e3a5a 0%, #23233a 100%);
+  transform: translateY(-2px) scale(1.03);
+}
+.btn-3d:disabled {
+  background: #44474a;
+  color: #bbb;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.btn-3d.active {
+  background: linear-gradient(180deg, #ffd700 0%, #bfa100 100%);
+  color: #222;
+  box-shadow: 0 8px 32px rgba(255,215,0,0.25), 0 1.5px 0 #bfa100 inset;
+  transform: translateY(-2px) scale(1.05);
+  border: 2.5px solid #222;
+  z-index: 1;
+}
+
+/* 入力欄やテーブルも黒背景に合うように */
+input, textarea, select {
+  background: #18181c;
+  color: #f5f5f7;
+  border: 1.5px solid #333;
+}
+input::placeholder, textarea::placeholder {
+  color: #888;
+}
+
+/* テーブル */
+table {
+  background: #18181c;
+  color: #f5f5f7;
+}
+th, td {
+  border-color: #222;
+}
+
+/* スクロールバーもダーク */
+::-webkit-scrollbar {
+  width: 8px;
+  background: #18181c;
+}
+::-webkit-scrollbar-thumb {
+  background: #23233a;
+  border-radius: 8px;
+}

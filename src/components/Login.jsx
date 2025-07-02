@@ -31,8 +31,10 @@ function Login({ onLogin }) {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '80px auto', background: '#fff', padding: 32, borderRadius: 16, boxShadow: '0 4px 16px rgba(0,0,0,0.10)' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: 24 }}>{isSignUp ? '新規登録' : 'ログイン'}</h2>
+    <div className="dashboard-card" style={{ maxWidth: 400, margin: '80px auto', background: '#fff', padding: 32, borderRadius: 16, boxShadow: '0 4px 16px rgba(0,0,0,0.10)' }}>
+      <div className="dashboard-card" style={{ padding: 24, marginBottom: 24 }}>
+        <h2 style={{ margin: 0, fontWeight: 800, fontSize: 28, letterSpacing: '0.04em' }}>{isSignUp ? '新規登録' : 'ログイン'}</h2>
+      </div>
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <input
           type="email"
@@ -51,12 +53,12 @@ function Login({ onLogin }) {
           style={{ padding: '12px 16px', borderRadius: 8, border: '1.5px solid #ced4da', fontSize: 16 }}
         />
         {error && <div style={{ color: 'red', textAlign: 'center' }}>{error}</div>}
-        <button type="submit" disabled={loading} style={{ padding: '12px 0', borderRadius: 8, border: 'none', background: '#007bff', color: '#fff', fontWeight: 'bold', fontSize: 16, cursor: loading ? 'not-allowed' : 'pointer' }}>
+        <button type="submit" className="btn-3d" disabled={loading}>
           {loading ? '処理中...' : isSignUp ? '新規登録' : 'ログイン'}
         </button>
       </form>
       <div style={{ textAlign: 'center', marginTop: 16 }}>
-        <button onClick={() => setIsSignUp(!isSignUp)} style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', textDecoration: 'underline', fontSize: 15 }}>
+        <button onClick={() => setIsSignUp(!isSignUp)} className="btn-3d" style={{ background: 'none', color: '#007bff', textDecoration: 'underline', fontSize: 15 }}>
           {isSignUp ? 'ログイン画面へ' : '新規登録はこちら'}
         </button>
       </div>
