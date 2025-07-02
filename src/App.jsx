@@ -2,10 +2,34 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from './supabaseClient'
 import './App.css'
 import GoogleMap from './components/GoogleMap'
-import GoogleCalendar from './components/GoogleCalendar'
 import AiChat from './components/AiChat'
 import InternalChat from './components/InternalChat'
 import ClientDashboard from './components/ClientDashboard'
+import CompanySearchDashboard from './components/CompanySearchDashboard'
+import MusicGenDashboard from './components/MusicGenDashboard'
+import N8NDashboard from './components/N8NDashboard'
+import GoogleCalendarDashboard from './components/GoogleCalendarDashboard'
+import GmailDashboard from './components/GmailDashboard'
+import NaviChatDashboard from './components/NaviChatDashboard'
+
+// タスクのステータス定義
+const STATUS = {
+  TODO: 'todo',
+  IN_PROGRESS: 'in_progress',
+  DONE: 'done'
+};
+
+const STATUS_LABELS = {
+  [STATUS.TODO]: '未着手',
+  [STATUS.IN_PROGRESS]: '対応中',
+  [STATUS.DONE]: '完了'
+};
+
+const STATUS_COLORS = {
+  [STATUS.TODO]: '#6c757d',
+  [STATUS.IN_PROGRESS]: '#007bff',
+  [STATUS.DONE]: '#28a745'
+};
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -17,27 +41,8 @@ function App() {
   // 編集中メモ
   const [editingMemo, setEditingMemo] = useState({});
 
-  // タブ管理
-  const [activeTab, setActiveTab] = useState('todo');
-
-  // タスクのステータス定義
-  const STATUS = {
-    TODO: 'todo',
-    IN_PROGRESS: 'in_progress',
-    DONE: 'done'
-  };
-
-  const STATUS_LABELS = {
-    [STATUS.TODO]: '未着手',
-    [STATUS.IN_PROGRESS]: '対応中',
-    [STATUS.DONE]: '完了'
-  };
-
-  const STATUS_COLORS = {
-    [STATUS.TODO]: '#6c757d',
-    [STATUS.IN_PROGRESS]: '#007bff',
-    [STATUS.DONE]: '#28a745'
-  };
+  // メニュー選択状態の管理
+  const [selectedMenu, setSelectedMenu] = useState('gcal'); // 例: デフォルトはGoogle Calendar Chat
 
   useEffect(() => {
     const getTodos = async () => {
@@ -56,10 +61,10 @@ function App() {
         setLoading(false);
       }
     };
-    if (activeTab === 'todo') {
+    if (selectedMenu === 'todo') {
       getTodos();
     }
-  }, [activeTab]);
+  }, [selectedMenu]);
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
@@ -157,16 +162,36 @@ function App() {
     }
   };
 
+  // タブメニュー定義
+  const menuItems = [
+    { key: 'todo', label: 'ToDo' },
+    { key: 'chat', label: 'Chat' },
+    { key: 'map', label: 'Route Search' },
+    { key: 'clients', label: 'Clients' },
+    { key: 'company', label: 'Company Search' },
+    { key: 'music', label: 'Music Gen' },
+    { key: 'n8n', label: 'N8N' },
+    { key: 'gcal', label: 'Google Calendar Chat' },
+    { key: 'gmail', label: 'Gmail' },
+    { key: 'navichat', label: 'Navi Chat' },
+  ];
+
   // タブコンテンツのレンダリング
   const renderTabContent = () => {
-    switch (activeTab) {
+    switch (selectedMenu) {
       case 'chat':
         return (
-          <div style={{ display: 'flex', gap: '24px', width: '100%', maxWidth: '1600px' }}>
-            <div style={{ flex: 1 }}>
+          <div style={{ 
+            display: 'flex', 
+            gap: '24px', 
+            width: '100%', 
+            height: '100%',
+            flexDirection: window.innerWidth <= 768 ? 'column' : 'row'
+          }}>
+            <div style={{ flex: 1, minHeight: window.innerWidth <= 768 ? '50%' : 'auto' }}>
               <AiChat />
             </div>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minHeight: window.innerWidth <= 768 ? '50%' : 'auto' }}>
               <InternalChat />
             </div>
           </div>
@@ -174,42 +199,49 @@ function App() {
       case 'todo':
         return (
           <div style={{
-            maxWidth: 600,
-            margin: '0 auto',
-            background: '#ffffff',
-            padding: '32px 24px',
+            width: '100%',
+            height: '100%',
+            background: '#23232a',
+            padding: window.innerWidth <= 768 ? '16px' : '32px',
             borderRadius: 16,
             boxShadow: '0 4px 16px rgba(0,0,0,0.10)',
-            width: '100%'
+            overflowY: window.innerWidth <= 768 ? 'auto' : 'hidden',
+            maxHeight: window.innerWidth <= 768 ? '100vh' : 'none',
+            display: 'flex',
+            flexDirection: 'column'
           }}>
-            <h2 style={{ color: '#333', marginBottom: '16px', fontSize: '24px', fontWeight: 'bold' }}>ToDo管理</h2>
+            <h2 style={{ 
+              color: '#fff', 
+              marginBottom: '16px', 
+              fontSize: window.innerWidth <= 768 ? '20px' : '24px', 
+              fontWeight: 'bold',
+              flexShrink: 0
+            }}>ToDo管理</h2>
             <div style={{
               display: 'flex',
-              gap: 24,
-              marginBottom: 32,
-              background: '#ffffff',
+              gap: window.innerWidth <= 768 ? 12 : 24,
+              marginBottom: 16,
+              background: 'transparent',
               flexDirection: 'row',
-              alignItems: 'stretch'
+              alignItems: 'center',
+              flexShrink: 0
             }}>
-              <div style={{ 
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px'
-              }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <input
                   type="text"
                   value={inputValue}
                   onChange={handleInputChange}
                   placeholder="新しいタスクを記入"
                   style={{
-                    width: '100%',
-                    padding: '12px 16px',
+                    width: window.innerWidth <= 768 ? '90vw' : '600px',
+                    maxWidth: '100%',
+                    minWidth: '200px',
+                    padding: window.innerWidth <= 768 ? '10px 12px' : '12px 16px',
                     borderRadius: '10px',
-                    border: '1.5px solid #ced4da',
-                    fontSize: '18px',
-                    background: '#ffffff',
-                    color: '#333',
+                    border: '1.5px solid #444',
+                    fontSize: window.innerWidth <= 768 ? '16px' : '18px',
+                    background: '#181a20',
+                    color: '#fff',
                   }}
                 />
                 <input
@@ -218,13 +250,15 @@ function App() {
                   onChange={handleMemoChange}
                   placeholder="メモ (任意)"
                   style={{
-                    width: '100%',
-                    padding: '12px 16px',
+                    width: window.innerWidth <= 768 ? '90vw' : '600px',
+                    maxWidth: '100%',
+                    minWidth: '200px',
+                    padding: window.innerWidth <= 768 ? '10px 12px' : '12px 16px',
                     borderRadius: '10px',
-                    border: '1.5px solid #ced4da',
-                    fontSize: '18px',
-                    background: '#ffffff',
-                    color: '#333',
+                    border: '1.5px solid #444',
+                    fontSize: window.innerWidth <= 768 ? '16px' : '18px',
+                    background: '#181a20',
+                    color: '#fff',
                   }}
                 />
               </div>
@@ -232,29 +266,43 @@ function App() {
                 onClick={handleAddTask} 
                 disabled={loading}
                 style={{
-                  padding: '8px 12px',
+                  marginLeft: 12,
+                  padding: window.innerWidth <= 768 ? '10px 16px' : '8px 12px',
                   borderRadius: '10px',
                   border: 'none',
                   background: loading ? '#6c757d' : '#ffd700',
                   cursor: loading ? 'not-allowed' : 'pointer',
-                  fontSize: '16px',
+                  fontSize: window.innerWidth <= 768 ? '14px' : '16px',
                   fontWeight: 'bold',
-                  width: '80px',
-                  height: '38px',
-                  alignSelf: 'flex-start',
-                  color: loading ? '#ffffff' : '#333'
+                  width: window.innerWidth <= 768 ? '100%' : '80px',
+                  height: window.innerWidth <= 768 ? 'auto' : '38px',
+                  alignSelf: 'center',
+                  color: loading ? '#ffffff' : '#222'
                 }}
               >
                 追加
               </button>
             </div>
             {loading ? (
-              <p style={{ fontSize: '22px', textAlign: 'center' }}>Loading tasks...</p>
+              <div style={{ 
+                fontSize: window.innerWidth <= 768 ? '18px' : '22px', 
+                textAlign: 'center',
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#fff'
+              }}>
+                Loading tasks...
+              </div>
             ) : (
               <ul style={{ 
                 listStyle: 'none', 
                 padding: 0,
-                margin: 0
+                margin: 0,
+                flex: 1,
+                overflowY: 'auto',
+                maxHeight: window.innerWidth <= 768 ? '60vh' : '400px',
               }}>
                 {todos.map(todo => (
                   <li 
@@ -263,48 +311,67 @@ function App() {
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '8px',
-                      padding: '20px',
-                      borderBottom: '2px solid #e9ecef',
-                      fontSize: '22px',
-                      background: '#f9f9f9',
+                      padding: window.innerWidth <= 768 ? '16px' : '20px',
+                      borderBottom: '2px solid #333',
+                      fontSize: window.innerWidth <= 768 ? '18px' : '22px',
+                      background: '#282c34',
                       borderRadius: '10px',
-                      marginBottom: '16px'
+                      marginBottom: '16px',
+                      color: '#fff',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                      <input
-                        type="checkbox"
-                        checked={todo.completed}
-                        onChange={() => handleToggleComplete(todo.id, todo.completed)}
-                        style={{
-                          width: '28px',
-                          height: '28px',
-                          cursor: 'pointer'
-                        }}
-                      />
-                      <span style={{ 
-                        flex: 1,
-                        textDecoration: todo.completed ? 'line-through' : 'none',
-                        color: todo.completed ? '#6c757d' : '#333',
-                        fontSize: '24px',
-                        fontWeight: 'bold'
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: window.innerWidth <= 768 ? '12px' : '20px',
+                      flexDirection: window.innerWidth <= 768 ? 'column' : 'row'
+                    }}>
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: window.innerWidth <= 768 ? '12px' : '20px',
+                        width: '100%'
                       }}>
-                        {todo.text}
-                      </span>
-                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <input
+                          type="checkbox"
+                          checked={todo.completed}
+                          onChange={() => handleToggleComplete(todo.id, todo.completed)}
+                          style={{
+                            width: window.innerWidth <= 768 ? '24px' : '28px',
+                            height: window.innerWidth <= 768 ? '24px' : '28px',
+                            cursor: 'pointer'
+                          }}
+                        />
+                        <span style={{ 
+                          flex: 1,
+                          textDecoration: todo.completed ? 'line-through' : 'none',
+                          color: todo.completed ? '#bbb' : '#fff',
+                          fontSize: window.innerWidth <= 768 ? '20px' : '24px',
+                          fontWeight: 'bold'
+                        }}>
+                          {todo.text}
+                        </span>
+                      </div>
+                      <div style={{ 
+                        display: 'flex', 
+                        gap: window.innerWidth <= 768 ? '8px' : '12px', 
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        width: window.innerWidth <= 768 ? '100%' : 'auto'
+                      }}>
                         {Object.values(STATUS).map(status => (
                           <button
                             key={status}
                             onClick={() => handleUpdateStatus(todo.id, status)}
                             style={{
-                              padding: '10px 18px',
+                              padding: window.innerWidth <= 768 ? '8px 12px' : '10px 18px',
                               borderRadius: '8px',
                               border: 'none',
-                              background: todo.status === status ? STATUS_COLORS[status] : '#f8f9fa',
-                              color: todo.status === status ? '#ffffff' : '#333',
+                              background: todo.status === status ? STATUS_COLORS[status] : '#444',
+                              color: todo.status === status ? '#fff' : '#ffd700',
                               cursor: 'pointer',
-                              fontSize: '18px',
-                              minWidth: '90px',
+                              fontSize: window.innerWidth <= 768 ? '14px' : '18px',
+                              minWidth: window.innerWidth <= 768 ? '70px' : '90px',
                               fontWeight: todo.status === status ? 'bold' : 'normal'
                             }}
                           >
@@ -314,14 +381,14 @@ function App() {
                         <button 
                           onClick={() => handleDeleteTask(todo.id)}
                           style={{
-                            padding: '10px 18px',
+                            padding: window.innerWidth <= 768 ? '8px 12px' : '10px 18px',
                             borderRadius: '8px',
                             border: 'none',
                             background: '#dc3545',
-                            color: '#ffffff',
+                            color: '#fff',
                             cursor: 'pointer',
-                            fontSize: '18px',
-                            minWidth: '90px',
+                            fontSize: window.innerWidth <= 768 ? '14px' : '18px',
+                            minWidth: window.innerWidth <= 768 ? '70px' : '90px',
                             fontWeight: 'bold'
                           }}
                         >
@@ -329,7 +396,7 @@ function App() {
                         </button>
                       </div>
                     </div>
-                    <div style={{ marginTop: '10px', width: '100%' }}>
+                    <div style={{ marginTop: '10px', width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
                       <input
                         type="text"
                         value={editingMemo[todo.id] !== undefined ? editingMemo[todo.id] : (todo.memo || '')}
@@ -337,13 +404,15 @@ function App() {
                         onChange={e => handleEditMemoChange(todo.id, e.target.value)}
                         onBlur={() => handleSaveMemo(todo.id)}
                         style={{
-                          width: '100%',
-                          padding: '12px 16px',
-                          borderRadius: '8px',
-                          border: '1.5px solid #ced4da',
-                          fontSize: '20px',
-                          background: '#fffbe6',
-                          color: '#222'
+                          width: window.innerWidth <= 768 ? '90vw' : '600px',
+                          maxWidth: '100%',
+                          minWidth: '200px',
+                          padding: window.innerWidth <= 768 ? '10px 12px' : '12px 16px',
+                          borderRadius: '10px',
+                          border: '1.5px solid #444',
+                          fontSize: window.innerWidth <= 768 ? '16px' : '18px',
+                          background: '#23232a',
+                          color: '#fff'
                         }}
                       />
                     </div>
@@ -353,102 +422,108 @@ function App() {
             )}
           </div>
         );
-      case 'calendar':
-        return <GoogleCalendar />;
       case 'map':
-        return <GoogleMap />;
+        return <div style={{ width: '100%', height: '100%' }}><GoogleMap /></div>;
       case 'clients':
-        return <ClientDashboard />;
+        return <div style={{ width: '100%', height: '100%' }}><ClientDashboard /></div>;
+      case 'company':
+        return <CompanySearchDashboard />;
+      case 'music':
+        return <MusicGenDashboard />;
+      case 'n8n':
+        return <N8NDashboard />;
+      case 'gcal':
+        return <GoogleCalendarDashboard />;
+      case 'gmail':
+        return <GmailDashboard />;
+      case 'navichat':
+        return <NaviChatDashboard />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="App" style={{ minHeight: '100vh', background: '#f4f6fa', padding: '32px 0' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '32px', fontSize: '2.2rem', fontWeight: 'bold', color: '#111' }}>Dashboard</h1>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 16px' }}>
-        <div style={{ display: 'flex', gap: 16, marginBottom: 32 }}>
-          <button
-            onClick={() => setActiveTab('todo')}
-            style={{
-              padding: '12px 32px',
-              borderRadius: '8px',
-              border: 'none',
-              background: activeTab === 'todo' ? '#007bff' : '#e9ecef',
-              color: '#111',
-              fontWeight: 'bold',
-              fontSize: '16px',
-              cursor: 'pointer'
-            }}
-          >
-            ToDo
-          </button>
-          <button
-            onClick={() => setActiveTab('chat')}
-            style={{
-              padding: '12px 32px',
-              borderRadius: '8px',
-              border: 'none',
-              background: activeTab === 'chat' ? '#007bff' : '#e9ecef',
-              color: '#111',
-              fontWeight: 'bold',
-              fontSize: '16px',
-              cursor: 'pointer'
-            }}
-          >
-            チャット
-          </button>
-          <button
-            onClick={() => setActiveTab('calendar')}
-            style={{
-              padding: '12px 32px',
-              borderRadius: '8px',
-              border: 'none',
-              background: activeTab === 'calendar' ? '#007bff' : '#e9ecef',
-              color: '#111',
-              fontWeight: 'bold',
-              fontSize: '16px',
-              cursor: 'pointer'
-            }}
-          >
-            スケジュール
-          </button>
-          <button
-            onClick={() => setActiveTab('map')}
-            style={{
-              padding: '12px 32px',
-              borderRadius: '8px',
-              border: 'none',
-              background: activeTab === 'map' ? '#007bff' : '#e9ecef',
-              color: '#111',
-              fontWeight: 'bold',
-              fontSize: '16px',
-              cursor: 'pointer'
-            }}
-          >
-            ルート検索
-          </button>
-          <button
-            onClick={() => setActiveTab('clients')}
-            style={{
-              padding: '12px 32px',
-              borderRadius: '8px',
-              border: 'none',
-              background: activeTab === 'clients' ? '#007bff' : '#e9ecef',
-              color: '#111',
-              fontWeight: 'bold',
-              fontSize: '16px',
-              cursor: 'pointer'
-            }}
-          >
-            名簿
-          </button>
+    <div style={{
+      width: '100vw',
+      height: '100vh',
+      background: '#181a20',
+      display: 'flex',
+      flexDirection: 'row',
+      overflow: 'hidden',
+    }}>
+      {/* サイドバー */}
+      <aside style={{
+        width: 210,
+        background: 'linear-gradient(180deg, #181a20 80%, #23232a 100%)',
+        color: '#fff',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'stretch',
+        padding: '32px 0 24px 0',
+        boxShadow: '2px 0 16px #0006',
+        zIndex: 2,
+        minHeight: '100vh',
+      }}>
+        <div style={{
+          fontWeight: 900,
+          fontSize: 22,
+          textAlign: 'center',
+          marginBottom: 32,
+          letterSpacing: '0.04em',
+          textShadow: '0 2px 24px #D7DDE8, 0 1px 0 #757F9A',
+          userSelect: 'none',
+        }}>
+          My Business<br />Dashboard
         </div>
-        {renderTabContent()}
-      </div>
+        {menuItems.map(item => (
+          <button
+            key={item.key}
+            onClick={() => setSelectedMenu(item.key)}
+            style={{
+              width: '90%',
+              margin: '0 auto 12px auto',
+              padding: '14px 0',
+              borderRadius: 8,
+              border: 'none',
+              background: selectedMenu === item.key ? 'linear-gradient(90deg, #ffd700 60%, #ffe066 100%)' : 'rgba(255,255,255,0.04)',
+              color: selectedMenu === item.key ? '#222' : '#fff',
+              fontWeight: selectedMenu === item.key ? 'bold' : 'normal',
+              fontSize: 16,
+              boxShadow: selectedMenu === item.key ? '0 2px 12px #ffd70044' : 'none',
+              cursor: 'pointer',
+              outline: 'none',
+              borderLeft: selectedMenu === item.key ? '6px solid #ffd700' : '6px solid transparent',
+              transition: 'all 0.15s',
+              textAlign: 'left',
+            }}
+          >
+            {item.label}
+          </button>
+        ))}
+      </aside>
+      {/* メインコンテンツ */}
+      <main style={{
+        flex: 1,
+        background: '#f4f6fa',
+        padding: '32px 0',
+        overflow: 'auto',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+      }}>
+        <div style={{
+          maxWidth: 1200,
+          margin: '0 auto',
+          width: '100%',
+          padding: '0 24px',
+          boxSizing: 'border-box',
+        }}>
+          {renderTabContent()}
+        </div>
+      </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
